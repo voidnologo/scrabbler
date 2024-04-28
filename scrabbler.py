@@ -24,8 +24,8 @@ async def finder(path, pattern, key):
     return [_[0] for _ in results if _[1] is True]
 
 
-async def coordinator(pattern, key):
-    data_paths = get_file_paths()
+async def coordinator(pattern, key, buckets):
+    data_paths = get_file_paths(buckets)
 
     async with asyncio.TaskGroup() as group:
         tasks = [group.create_task(finder(path, pattern, key)) for path in data_paths]
@@ -36,11 +36,11 @@ def flatten(data):
     return chain.from_iterable(data)
 
 
-def main(pattern, key):
-    results = asyncio.run(coordinator(pattern, key))
+def main(pattern, key, buckets='text/buckets'):
+    results = asyncio.run(coordinator(pattern, key, buckets))
     r = sorted(flatten(results))
     print(r)
 
 
 if __name__ == '__main__':
-    main(Pattern.SUBSET, 'e')
+    main(Pattern.SUBSET, 'e', 'text/words_as_weapons_bucket')
