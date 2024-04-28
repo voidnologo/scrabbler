@@ -1,6 +1,7 @@
 import asyncio
 from itertools import chain
 
+from decorators import time_me
 from files import get_file_paths
 from search import check, Pattern
 
@@ -36,6 +37,7 @@ def flatten(data):
     return chain.from_iterable(data)
 
 
+@time_me
 def main(pattern, key, buckets='text/buckets'):
     results = asyncio.run(coordinator(pattern, key, buckets))
     r = sorted(flatten(results))
