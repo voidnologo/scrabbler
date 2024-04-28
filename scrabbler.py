@@ -43,4 +43,4 @@ def main(pattern, key, buckets='text/buckets'):
 
 
 if __name__ == '__main__':
-    main(Pattern.SUBSET, 'e', 'text/words_as_weapons_bucket')
+    main(Pattern.SUBSET, 'fish', 'text/buckets')
