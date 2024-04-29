@@ -11,18 +11,20 @@ def file_contents(path):
         return f.read().splitlines()
 
 
-async def filter(pattern, word, key):
-    return await asyncio.to_thread(check, pattern, word, key)
+# async def filter(pattern, word, key):
+#     return await asyncio.to_thread(check, pattern, word, key)
 
 
 async def finder(path, pattern, key):
     blocking = asyncio.to_thread(file_contents, path)
     word_list = list(await asyncio.create_task(blocking))
-    async with asyncio.TaskGroup() as group:
-        tasks = [group.create_task(filter(pattern, word, key)) for word in word_list]
+    return [word for word in word_list if check(pattern, word, key)]
 
-    results = zip(word_list, (t.result() for t in tasks))
-    return [_[0] for _ in results if _[1] is True]
+    # TODO: these next four lines add 18 seconds to process
+    # async with asyncio.TaskGroup() as group:
+    #     tasks = [group.create_task(filter(pattern, word, key)) for word in word_list]
+    # results = zip(word_list, (t.result() for t in tasks))
+    # return [_[0] for _ in results if _[1] is True]
 
 
 async def coordinator(pattern, key, buckets):
@@ -41,8 +43,13 @@ def flatten(data):
 def main(pattern, key, buckets='text/buckets'):
     results = asyncio.run(coordinator(pattern, key, buckets))
     r = sorted(flatten(results))
+    print(pattern)
+    print(f'{len(r)} results found.')
     print(r)
 
 
 if __name__ == '__main__':
-    main(Pattern.SUBSET, 'fish', 'text/buckets')
+    main(Pattern.ENDSWITH, 'fish', 'text/buckets')
+    main(Pattern.STARTSWITH, 'fish', 'text/buckets')
+    main(Pattern.SUBSTR, 'fish', 'text/buckets')
+    main(Pattern.CONTAINS, 'hifs', 'text/buckets')
